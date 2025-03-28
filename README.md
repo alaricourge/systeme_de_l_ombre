@@ -30,7 +30,7 @@ Assure-toi également d’avoir Stockfish installé et accessible dans ton syst�
 
 1. Clone ce dépôt :
 ```bash
-git clone https://github.com/ton-utilisateur/chess-analyzer.git
+git clone https://github.com/alaricourge/systeme_de_l_ombre.git
 cd chess-analyzer
 ```
 BIENTOT
