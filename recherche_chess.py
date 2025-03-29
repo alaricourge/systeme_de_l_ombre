@@ -32,10 +32,14 @@ def find_party(name):
     time.sleep(3)
     elem=driver.find_element(By.CSS_SELECTOR, "#view-profile > div.v5-section-clear > div:nth-child(2) > div > table > tbody > tr:nth-child(1)")
     elem.location_once_scrolled_into_view
+    # black and white 
+    white=elem.find_element(By.CSS_SELECTOR,"#view-profile > div.v5-section-clear > div:nth-child(2) > div > table > tbody > tr:nth-child(1) > td.archived-games-user-cell > div > div > div:nth-child(1)").text
+    black=elem.find_element(By.CSS_SELECTOR,"#view-profile > div.v5-section-clear > div:nth-child(2) > div > table > tbody > tr:nth-child(1) > td.archived-games-user-cell > div > div > div:nth-child(2)").text
+
     driver.find_element(By.CSS_SELECTOR, "#view-profile > div.v5-section-clear > div:nth-child(2) > div > table > tbody > tr:nth-child(1) > td.archived-games-icon-block > a").click()
     time.sleep(3)
     
-    return find_coups(driver)
+    return find_coups(driver), white, black
 
 if __name__=="__main__":
     print(find_party())
