@@ -1,6 +1,7 @@
 import chess
 import chess.pgn
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Button
 import cairosvg
@@ -11,14 +12,19 @@ from chess import Move
 from recherche_chess import find_party
 from analyse_party import *
 
-
-name="grandmother"
-## Récupération des coups
+action='test'
 name_white,name_black = "white","black"
-coups,name_white,name_black = find_party(name)
-## ANALYSE
-print('analyse')
-df = analysing_fish(coups)
+if action =="test": 
+    df=pd.read_csv('game_data.csv')
+    df['move'] = df['move'].apply(lambda x: chess.Move.from_uci(x))
+    df['best_move'] = df['best_move'].apply(lambda x: chess.Move.from_uci(x))
+else:
+    name="grandmother"
+    ## Récupération des coups
+    coups,name_white,name_black = find_party(name)
+    ## ANALYSE
+    print('analyse')
+    df = analysing_fish(coups)
 #transformation en liste
 moves= df.move.to_list()
 best_moves = df.best_move.to_list()
@@ -77,10 +83,9 @@ def update_board():
             rate_coup=eval_rise(df.evaluation[current_move]-df.evaluation[current_move-1])
         else:
             rate_coup=eval_rise(-df.evaluation[current_move]+df.evaluation[current_move-1])
-        real_title_text = rate_coup+"\n"+str(df.str_reply[current_move-1])
+        real_title_text = str(current_move)+" : "+rate_coup+"\n"+str(df.str_reply[current_move-1])
     title_text = "Chess" if current_move <= 0 else real_title_text
     ax.set_title(title_text, fontsize=14, fontweight='bold')
-    plt.yticks(0,str(current_move+1), fontsize=12,fontweight="bold")
 
     # Dessiner une flèche
     start, end = best_moves[current_move].from_square, best_moves[current_move].to_square
