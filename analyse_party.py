@@ -74,3 +74,15 @@ def analysing_fish(coups):
     df['accurate']=df['move']==df['best_move']
     df['str_reply'] = df['reply'].apply(lambda x: [str(i) for i in x])
     return df
+
+def eval_rise(number):
+    if number>-0.2:
+        return "very good"
+    elif number>- 0.5 :
+        return "good"
+    elif number>- 1.2:
+        return "mid"
+    elif number>- 2.5:
+        return "bad"
+    else:
+        return "very bad"
