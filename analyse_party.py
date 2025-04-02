@@ -37,7 +37,7 @@ def analysing_fish(coups):
 
         score = evaluation["score"].relative.score(mate_score=10000) if evaluation["score"].relative.is_mate() else evaluation["score"].relative.score()
         if 'pv' in evaluation:
-            reply=evaluation["pv"][0:5]
+            reply=evaluation["pv"]
         else:
             reply='a1h8'
         if i%2==0:
@@ -72,7 +72,8 @@ def analysing_fish(coups):
     df.rename(columns={'1reply':'best_move'}, inplace=True)
     # ACCURACY of the game
     df['accurate']=df['move']==df['best_move']
-    df['str_reply'] = df['reply'].apply(lambda x: [str(i) for i in x])
+    df['str_reply'] = df['reply'].apply(lambda x: x[0:5])
+    df['str_reply'] = df['str_reply'].apply(lambda x: [str(i) for i in x])
     return df
 
 def eval_rise(number):
@@ -86,3 +87,9 @@ def eval_rise(number):
         return "bad"
     else:
         return "very bad"
+    
+def mat_en(reply):
+    if len(reply)<8:
+        return "mat en "+str(len(reply))+"\n"
+    else:
+        return ""

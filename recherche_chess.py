@@ -11,6 +11,7 @@ import time
 
 chrome_options = Options()
 chrome_options.add_argument("--start-maximized")
+#chrome_options.add_argument("--headless")
 chrome_options.add_experimental_option("detach",True)
 def find_coups(driver):
     time.sleep(3)
@@ -25,19 +26,17 @@ def find_coups(driver):
     driver.quit()
     return reel_coups
 
-def find_party(name):
+def find_party(name,number=1):
     driver=webdriver.Chrome( options=chrome_options)
-    # search on societe.com
     driver.get("https://www.chess.com/member/"+name)
-    time.sleep(3)
-    elem=driver.find_element(By.CSS_SELECTOR, "#view-profile > div.v5-section-clear > div:nth-child(2) > div > table > tbody > tr:nth-child(1)")
+    time.sleep(2.5)
+    elem=driver.find_element(By.CSS_SELECTOR, "#view-profile > div.cc-section-clear > div.v5-section.v5-overflow-hidden > div > table > tbody > tr:nth-child("+str(number)+")")
     elem.location_once_scrolled_into_view
-    # black and white 
-    white=elem.find_element(By.CSS_SELECTOR,"#view-profile > div.v5-section-clear > div:nth-child(2) > div > table > tbody > tr:nth-child(1) > td.archived-games-user-cell > div > div > div:nth-child(1)").text
-    black=elem.find_element(By.CSS_SELECTOR,"#view-profile > div.v5-section-clear > div:nth-child(2) > div > table > tbody > tr:nth-child(1) > td.archived-games-user-cell > div > div > div:nth-child(2)").text
+    white=elem.find_element(By.CSS_SELECTOR,"#view-profile > div.cc-section-clear > div.v5-section.v5-overflow-hidden > div > table > tbody > tr:nth-child("+str(number)+") > td.archived-games-user-cell > div > div > div:nth-child(1)").text
+    black=elem.find_element(By.CSS_SELECTOR,"#view-profile > div.cc-section-clear > div.v5-section.v5-overflow-hidden > div > table > tbody > tr:nth-child("+str(number)+") > td.archived-games-user-cell > div > div > div:nth-child(2)").text
 
-    driver.find_element(By.CSS_SELECTOR, "#view-profile > div.v5-section-clear > div:nth-child(2) > div > table > tbody > tr:nth-child(1) > td.archived-games-icon-block > a").click()
-    time.sleep(3)
+    driver.find_element(By.CSS_SELECTOR, "#view-profile > div.cc-section-clear > div.v5-section.v5-overflow-hidden > div > table > tbody > tr:nth-child("+str(number)+")").click()
+    time.sleep(2.5)
     
     return find_coups(driver), white, black
 

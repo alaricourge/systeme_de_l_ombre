@@ -12,55 +12,23 @@ from chess import Move
 from recherche_chess import find_party
 from analyse_party import *
 
-action='test'
-name_white,name_black = "white","black"
-if action =="test": 
-    df=pd.read_csv('game_data.csv')
-    df['move'] = df['move'].apply(lambda x: chess.Move.from_uci(x))
-    df['best_move'] = df['best_move'].apply(lambda x: chess.Move.from_uci(x))
-else:
-    name="grandmother"
-    ## Récupération des coups
-    coups,name_white,name_black = find_party(name)
-    ## ANALYSE
-    print('analyse')
-    df = analysing_fish(coups)
-#transformation en liste
-moves= df.move.to_list()
-best_moves = df.best_move.to_list()
+current_move = -1  # Indice du coup
 
-# transformation de chiffre en position dans une matrice
 def number_to_position(n):
     x = n // 8
     y = n % 8
     return 7-x,y 
 
-# accuracy de la partie 
-print('accuracy: ',df.accurate.mean())
-# accuracy par joueur
-print('accuracy white '+name_white+' : ',df[df.move_number%2==0].accurate.mean())
-print('accuracy black '+name_black+' : ',df[df.move_number%2==1].accurate.mean())
-
-# Récupération de la liste des coups
-board = chess.Board()
-current_move = -1  # Indice du coup
-
-# AFFICHAGE DE LA COURBE DE LA PARTIE
-plt.figure(figsize=(8,4))
-plt.plot(df["evaluation"], color='black')
-plt.yscale("symlog", linthresh=10)
-plt.fill_between(df.index, df["evaluation"], np.max(df["evaluation"]), color='#0000', alpha=1)
-plt.yticks([np.min(df["evaluation"]), np.max(df["evaluation"])], [ name_white, name_black], fontsize=12,fontweight="bold")  
-plt.title("Évaluation de la position")
-plt.xlabel("Coup")
-plt.ylabel("Évaluation")
-plt.grid(True)
-
-
-
-
-
-fig, ax = plt.subplots(figsize=(5, 5))
+def courbe_partie(df,name_white,name_black):
+    plt.figure(figsize=(8,4))
+    plt.plot(df["evaluation"], color='black')
+    plt.yscale("symlog", linthresh=10)
+    plt.fill_between(df.index, df["evaluation"], np.max(df["evaluation"]), color='#0000', alpha=1)
+    plt.yticks([np.min(df["evaluation"]), np.max(df["evaluation"])], [ name_white, name_black], fontsize=12,fontweight="bold")  
+    plt.title("Évaluation de la position")
+    plt.xlabel("Coup")
+    plt.ylabel("Évaluation")
+    plt.grid(True)
 
 def update_board():
     global current_move
@@ -83,7 +51,7 @@ def update_board():
             rate_coup=eval_rise(df.evaluation[current_move]-df.evaluation[current_move-1])
         else:
             rate_coup=eval_rise(-df.evaluation[current_move]+df.evaluation[current_move-1])
-        real_title_text = str(current_move)+" : "+rate_coup+"\n"+str(df.str_reply[current_move-1])
+        real_title_text = mat_en(df.reply[current_move])+str(current_move)+" : "+rate_coup+"\n"+str(df.str_reply[current_move-1])
     title_text = "Chess" if current_move <= 0 else real_title_text
     ax.set_title(title_text, fontsize=14, fontweight='bold')
 
@@ -111,15 +79,51 @@ def prev_move(event):
         current_move -= 1
         update_board()
 
+if __name__ == "__main__":
+    action=''
+    name_white,name_black = "white","black"
+    ## DEFLAUT 
+    if action =="test": 
+        df=pd.read_csv('game_data.csv')
+        df['move'] = df['move'].apply(lambda x: chess.Move.from_uci(x))
+        df['best_move'] = df['best_move'].apply(lambda x: chess.Move.from_uci(x))
+    # REAL
+    else:
+        ### PUT YOUR NAME HERE ###
+        # frouty6
+        name="Alan-Rick"
+        ## Récupération des coups
+        coups,name_white,name_black = find_party(name,2)
+        ## ANALYSE
+        print('analyse')
+        df = analysing_fish(coups)
+    #transformation en liste
+    moves= df.move.to_list()
+    best_moves = df.best_move.to_list()
 
+    # transformation de chiffre en position dans une matrice
 
-ax_prev = plt.axes([0.1, 0.01, 0.15, 0.075])
-ax_next = plt.axes([0.75, 0.01, 0.15, 0.075])
-btn_prev = Button(ax_prev, '⬅ Précédent')
-btn_next = Button(ax_next, 'Suivant ➡')
+    # accuracy de la partie 
+    print('accuracy: ',df.accurate.mean())
+    # accuracy par joueur
+    print('accuracy white '+name_white+' : ',df[df.move_number%2==0].accurate.mean())
+    print('accuracy black '+name_black+' : ',df[df.move_number%2==1].accurate.mean())
 
-btn_prev.on_clicked(prev_move)
-btn_next.on_clicked(next_move)
+    # Récupération de la liste des coups
+    board = chess.Board()
+    current_move = -1  # Indice du coup
 
-update_board()
-plt.show()
+    # AFFICHAGE DE LA COURBE DE LA PARTIE
+    courbe_partie(df,name_white,name_black)
+    fig, ax = plt.subplots(figsize=(5, 5))
+
+    ax_prev = plt.axes([0.1, 0.01, 0.15, 0.075])
+    ax_next = plt.axes([0.75, 0.01, 0.15, 0.075])
+    btn_prev = Button(ax_prev, '⬅ Précédent')
+    btn_next = Button(ax_next, 'Suivant ➡')
+
+    btn_prev.on_clicked(prev_move)
+    btn_next.on_clicked(next_move)
+
+    update_board()
+    plt.show()
