@@ -7,7 +7,7 @@ import numpy as np
 import re
 from tqdm import tqdm
 
-enginefile = "stockfish-windows-x86-64-avx2.exe" # engine file name
+enginefile = "/Users/alaricdebastard/Documents/autre/systeme_de_l_ombre/stockfish-macos-m1-apple-silicon" # engine file name
 
 def ass_to_move(ass):
     a=str(ass)

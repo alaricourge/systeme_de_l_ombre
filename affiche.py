@@ -1,13 +1,16 @@
 import chess
 import chess.pgn
+from chess import Move
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Button
-import cairosvg
+from matplotlib.offsetbox import OffsetImage, AnnotationBbox
+import os
+
+#import cairosvg
 from PIL import Image
 from io import BytesIO
-from chess import Move
 # CODE 
 from recherche_chess import find_party
 from analyse_party import *
@@ -30,41 +33,67 @@ def courbe_partie(df,name_white,name_black):
     plt.ylabel("Évaluation")
     plt.grid(True)
 
+def draw_board(ax, board):
+
+    piece_dir = "pieces/" 
+    colors = ["#F0D9B5", "#B58863"]
+    square_size = 1
+
+    for i in range(8):
+        for j in range(8):
+            color = colors[(i + j) % 2]
+            rect = plt.Rectangle((j, 7 - i), square_size, square_size, facecolor=color)
+            ax.add_patch(rect)
+
+            square = chess.square(j, i)
+            piece = board.piece_at(square)
+            if piece:
+                img_path = os.path.join(piece_dir, f"{piece.color and 'w' or 'b'}{piece.symbol().lower()}.png")
+                image = Image.open(img_path).convert("RGBA")
+                # if piece king zoom =0.015
+                if img_path == "pieces/wk.png":
+                    zoom = 0.015
+                elif img_path == "pieces/bk.png":
+                    zoom = 0.015
+                else:
+                    zoom = 0.03
+                imagebox = OffsetImage(image, zoom=zoom)
+                ab = AnnotationBbox(imagebox, (j + 0.5, 7 - i + 0.5), frameon=False)
+                ax.add_artist(ab)
+                
+
 def update_board():
     global current_move
     board.reset()
     for i in range(current_move + 1):
         board.push(moves[i])
-    
-    # Générer l'échiquier
-    board_svg = chess.svg.board(board=board, size=350)
-    img = cairosvg.svg2png(bytestring=board_svg)
-    img = Image.open(BytesIO(img))
-    
+
     ax.clear()
-    ax.imshow(img)
+    draw_board(ax, board)
+    ax.set_xlim(0, 8)
+    ax.set_ylim(0, 8)
     ax.set_xticks([])
     ax.set_yticks([])
-    rate_coup=""
+
+    # Évaluer le coup
+    rate_coup = ""
     if current_move > 0:
-        if current_move%2==0:
-            rate_coup=eval_rise(df.evaluation[current_move]-df.evaluation[current_move-1])
-        else:
-            rate_coup=eval_rise(-df.evaluation[current_move]+df.evaluation[current_move-1])
-        real_title_text = mat_en(df.reply[current_move])+str(current_move)+" : "+rate_coup+"\n"+str(df.str_reply[current_move-1])
+        delta = df.evaluation[current_move] - df.evaluation[current_move - 1]
+        rate_coup = eval_rise(delta if current_move % 2 == 0 else -delta)
+        real_title_text = mat_en(df.reply[current_move]) + str(current_move) + " : " + rate_coup + "\n" + str(df.str_reply[current_move - 1])
     title_text = "Chess" if current_move <= 0 else real_title_text
     ax.set_title(title_text, fontsize=14, fontweight='bold')
 
     # Dessiner une flèche
     start, end = best_moves[current_move].from_square, best_moves[current_move].to_square
-    start = number_to_position(start)
-    end = number_to_position(end)
-    start_x, start_y = 32+40*start[1],32+40*start[0]
-    end_x, end_y = 32+40*end[1],32+40*end[0]
-    ax.annotate("", xy=(end_x, end_y), xytext=(start_x, start_y),
-                arrowprops=dict(arrowstyle="->", lw=5, color="red"))
+    start_pos = (chess.square_file(start), 7 - chess.square_rank(start))
+    end_pos = (chess.square_file(end), 7 - chess.square_rank(end))
+
+    ax.annotate("", xy=(end_pos[0]+0.5, end_pos[1]+0.5), xytext=(start_pos[0]+0.5, start_pos[1]+0.5),
+                arrowprops=dict(arrowstyle="->", lw=2, color="red"))
 
     plt.draw()
+
 
 # Boutons de navigation
 def next_move(event):
@@ -80,7 +109,7 @@ def prev_move(event):
         update_board()
 
 if __name__ == "__main__":
-    action=''
+    action='test'
     name_white,name_black = "white","black"
     ## DEFLAUT 
     if action =="test": 
@@ -91,7 +120,7 @@ if __name__ == "__main__":
     else:
         ### PUT YOUR NAME HERE ###
         # frouty6
-        name="Alan-Rick"
+        name="hugues"
         ## Récupération des coups
         coups,name_white,name_black = find_party(name,2)
         ## ANALYSE
