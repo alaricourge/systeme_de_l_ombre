@@ -48,6 +48,8 @@ def draw_board(ax, board):
             square = chess.square(j, i)
             piece = board.piece_at(square)
             if piece:
+                # voire si c'est possible de mettre des gif 
+                # mettre d'autre image
                 img_path = os.path.join(piece_dir, f"{piece.color and 'w' or 'b'}{piece.symbol().lower()}.png")
                 image = Image.open(img_path).convert("RGBA")
                 # if piece king zoom =0.015
@@ -109,7 +111,7 @@ def prev_move(event):
         update_board()
 
 if __name__ == "__main__":
-    action='test'
+    action=''
     name_white,name_black = "white","black"
     ## DEFLAUT 
     if action =="test": 
@@ -120,7 +122,7 @@ if __name__ == "__main__":
     else:
         ### PUT YOUR NAME HERE ###
         # frouty6
-        name="hugues"
+        name="frouty6"
         ## Récupération des coups
         coups,name_white,name_black = find_party(name,2)
         ## ANALYSE

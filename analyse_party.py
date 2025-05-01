@@ -25,7 +25,7 @@ def uci_to_san(uci):
 
 
 def analysing_fish(coups):
-    asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
+    # asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
     # Initialisation du moteur
     engine = chess.engine.SimpleEngine.popen_uci(enginefile, setpgrp=True)
     gamedata = []
