@@ -41,6 +41,14 @@ while True:
         print(board.fen())
         print("")
         move = input("Enter your move (or 'q' to quit): ")
+    if len(move) > 10:
+        # try board.fen
+        try:
+            board.set_fen(move)
+            continue
+        except ValueError:
+            print("Invalid FEN string. Please try again.")
+            continue
     if move == 'back':
         # revenir en arrière
         board.pop()

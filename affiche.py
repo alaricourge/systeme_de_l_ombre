@@ -109,9 +109,16 @@ def prev_move(event):
     if current_move >= 0:
         current_move -= 1
         update_board()
+import pyperclip
+def fen_to_clipboard(event):
+    global current_move
+    if current_move >= 0:
+        fen = df.board[current_move]
+        pyperclip.copy(fen)
+        print("FEN copied to clipboard:", fen)
 
 if __name__ == "__main__":
-    action=''
+    action='test'
     name_white,name_black = "white","black"
     ## DEFLAUT 
     if action =="test": 
@@ -150,9 +157,12 @@ if __name__ == "__main__":
 
     ax_prev = plt.axes([0.1, 0.01, 0.15, 0.075])
     ax_next = plt.axes([0.75, 0.01, 0.15, 0.075])
+    ax_fen = plt.axes([0.4, 0.01, 0.15, 0.075])
     btn_prev = Button(ax_prev, '⬅ Précédent')
     btn_next = Button(ax_next, 'Suivant ➡')
-
+    btn_fen = Button(ax_fen, 'FEN')
+    
+    btn_fen.on_clicked(fen_to_clipboard)
     btn_prev.on_clicked(prev_move)
     btn_next.on_clicked(next_move)
 
